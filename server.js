@@ -2,6 +2,7 @@
 require('dotenv').config()
 const express = require('express');
 const multer = require('multer');
+const https = require('https');
 const fs = require('fs');
 const {
   encryptFile,
@@ -78,4 +79,12 @@ app.delete('/delete/:filename', async (req, res) => {
   res.send('Key deleted from HSM. File is now unrecoverable.');
 });
 
-app.listen(PORT, () => console.log(`FADE Express app running on port ${PORT}`));
+
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
+https.createServer(options, app).listen(443, () => {
+  console.log('Express app listening on port 443 (HTTPS)');
+});
