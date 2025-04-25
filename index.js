@@ -3,6 +3,7 @@ const util = require('util');
 const { jwtDecode } = require('jwt-decode')
 const execPromise = util.promisify(exec);
 const crypto = require('crypto');
+const { exit } = require('process');
 const nonce = crypto.randomBytes(16).toString('base64');
 
 async function runCommand() {
@@ -24,13 +25,15 @@ async function runCommand() {
         jwt['x-ms-isolation-tee']['x-ms-compliance-status'] === 'azure-compliant-cvm' &&
         jwt['x-ms-runtime']['keys'][0]['kid'] === 'TpmEphemeralEncryptionKey' &&
         // nonce in the jwt is base64 encoded
-        jwt['x-ms-runtime']['client-payload']['nonce'] === Buffer.from(nonce).toString('base64')
+        jwt['x-ms-runtime']['client-payload']['nonce'] === Buffer.from(nonce).toString('base64') &&
+        jwt['iss'].includes('attest.azure.net')
     ) {
         console.log("JWT Attestation passed");
-        await execPromise('node ./server.js')
+        exit(0)
     }
   } catch (error) {
     console.error('Failed to execute command:', error);
+    exit(1)
   }
 }
 
