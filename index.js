@@ -9,7 +9,10 @@ async function runCommand() {
   try {
     console.log("Generated nonce: ",nonce)
     console.log("Getting attestation JWT")
-    const { stdout, stderr } = await execPromise(`sudo ./AttestationClient -n ${nonce} -o token`);
+    const { stdout, stderr } = await execPromise(`sudo ../confidential-computing-cvm-guest-attestation/cvm-attestation-sample-app/AttestationClient -n ${nonce} -o token`);
+    
+    if (stderr) {console.error('Error:', stderr); return;}
+    
     console.log("JWT Retrieved.")
     console.log('JWT Output:', jwtDecode(stdout));
     const jwt = jwtDecode(stdout);
@@ -26,7 +29,6 @@ async function runCommand() {
         console.log("JWT Attestation passed");
         await execPromise('node ./server.js')
     }
-    if (stderr) console.error('Error:', stderr);
   } catch (error) {
     console.error('Failed to execute command:', error);
   }
