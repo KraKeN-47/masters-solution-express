@@ -23,6 +23,8 @@ async function runCommand() {
         jwt['x-ms-attestation-type'] === 'azurevm' && 
         jwt['x-ms-isolation-tee']['x-ms-attestation-type'] === 'sevsnpvm' &&
         jwt['x-ms-isolation-tee']['x-ms-compliance-status'] === 'azure-compliant-cvm' &&
+        jwt['x-ms-isolation-tee']['vm-configuration']['secure-boot'] === true &&
+        jwt['x-ms-isolation-tee']['vm-configuration']['tpm-enabled'] === true &&
         jwt['x-ms-runtime']['keys'][0]['kid'] === 'TpmEphemeralEncryptionKey' &&
         // nonce in the jwt is base64 encoded
         jwt['x-ms-runtime']['client-payload']['nonce'] === Buffer.from(nonce).toString('base64') &&
