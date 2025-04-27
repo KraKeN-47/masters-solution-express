@@ -15,7 +15,7 @@ async function runCommand() {
     if (stderr) {console.error('Error:', stderr); return;}
     
     console.log("JWT Retrieved.")
-    console.log('JWT Output:', jwtDecode(stdout));
+    console.log('JWT Output:', JSON.stringify(jwtDecode(stdout),null,4));
     const jwt = jwtDecode(stdout);
     // await execPromise(`echo ${JSON.stringify(jwt)} > ./decoded.txt`)
 
