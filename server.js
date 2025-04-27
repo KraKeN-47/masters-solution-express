@@ -58,11 +58,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   
   const deleteTempFilesStart = performance.now();
   // delete temp files
-  console.log({
-    path,
-    encryptedPath,
-    other: `${encryptedPath}-wrapped-key`
-  })
   fs.unlinkSync(path),
   fs.unlinkSync(encryptedPath)
   fs.unlinkSync(`${encryptedPath}-wrapped-key`)
