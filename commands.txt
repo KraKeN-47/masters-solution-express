@@ -1,0 +1,11 @@
+curl -X POST http://localhost:3000/upload \
+  -F "file=@/path/to/your/file.txt"
+
+
+curl -X GET http://localhost:3000/download/file.txt -o decrypted-file.txt
+
+
+curl -X DELETE https://localhost:3000/delete/file.txt
+
+
+curl DELETE https://localhost:3000/delete/myFile2.txt
