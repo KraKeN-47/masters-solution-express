@@ -16,15 +16,7 @@ function encryptFile(inputPath, outputPath, key,wrappedKey) {
     output.write(iv); // prepend IV
   
     input.pipe(cipher).pipe(output).on('finish', () => {
-      const encryptedOutput = fs.readFileSync(outputPath)
-      // Create a 4-byte buffer for the length of unencrypted data
-      const metadataBuffer = Buffer.alloc(4);
-      // insert metadata on wrapped keys buffer length
-      metadataBuffer.writeUInt32BE(wrappedKey.length);
-      metadataBuffer.writeUInt32BE(encryptedOutput.length);
-      // Append metadata and unencrypted data
       fs.writeFileSync(`${outputPath}-wrapped-key`,wrappedKey)
-      // fs.writeFileSync(outputPath,Buffer.concat([metadataBuffer,wrappedKey,encryptedOutput]),);
       resolve();
     }).on('error', reject);
   });
