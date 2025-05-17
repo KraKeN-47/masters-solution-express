@@ -10,6 +10,7 @@ function encryptFile(inputPath, outputPath, key,wrappedKey) {
     
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    console.log({inputPath, outputPath})
     const input = fs.createReadStream(inputPath);
     const output = fs.createWriteStream(outputPath);
 
