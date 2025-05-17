@@ -39,7 +39,7 @@ async function unwrapKeyWithVault(fileId,wrappedKeyBuffer,machineType) {
 
 async function deleteKeyFromVault(fileId, machineType) {
   const keyName = `${machineType}-file-${fileId}`;
-  // await keyClient.beginDeleteKey(keyName);
+  await keyClient.beginDeleteKey(keyName);
   await keyClient.purgeDeletedKey(keyName);
 }
 
