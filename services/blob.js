@@ -1,21 +1,16 @@
-const { BlobServiceClient } = require('@azure/storage-blob');
-
-const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
-const containerClient = blobServiceClient.getContainerClient('cvm-blob');
-
-async function uploadToBlob(filePath, filename) {
-  const blockBlobClient = containerClient.getBlockBlobClient(filename);
+async function uploadToBlob(filePath, filename, client) {
+  const blockBlobClient = client.getBlockBlobClient(filename);
   await blockBlobClient.uploadFile(filePath);
 }
 
-async function downloadFromBlob(filename) {
-  const blockBlobClient = containerClient.getBlockBlobClient(filename);
+async function downloadFromBlob(filename, client) {
+  const blockBlobClient = client.getBlockBlobClient(filename);
   const downloadResponse = await blockBlobClient.download();
   return await streamToBuffer(downloadResponse.readableStreamBody);
 }
 
-async function deleteBlob(filename) {
-  const blockBlobClient = containerClient.getBlockBlobClient(filename);
+async function deleteBlob(filename, client) {
+  const blockBlobClient = client.getBlockBlobClient(filename);
   console.log('deleting', filename)
   await blockBlobClient.deleteIfExists();
   console.log('deleted if exists')

@@ -1,6 +1,6 @@
 const fetch = require('node-fetch')
 const fs = require('fs')
-const { pipeline } = require('stream/promises') // Use the promise-based version
+const { pipeline } = require('stream/promises')
 
 const downloadUrl = process.argv[2]
 const downloadPath = `./downloads/downloaded_${process.argv[3]}`; // Explicit output path
@@ -12,7 +12,7 @@ async function downloadFile() {
     const downloadEndpointStart = performance.now();
     const response = await fetch(downloadUrl, {
       method: 'GET',
-      //  We need to disable SSL verification because we are using localhost with a self-signed certificate
+      // We need to disable SSL verification because we are using a self-signed certificate
       agent: new (require('https')).Agent({ rejectUnauthorized: false }),
     });
     const downloadEndpointEnd = performance.now();

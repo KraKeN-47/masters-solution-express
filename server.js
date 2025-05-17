@@ -19,10 +19,14 @@ const {
   unwrapKeyWithVault, 
   deleteKeyFromVault
 } = require('./services/keyvault');
-const table = require('table');
+const { BlobServiceClient } = require('@azure/storage-blob');
 
 const upload = multer({ dest: 'uploads/' });
 const app = express();
+
+const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
+const cvmBlobContainerClient = blobServiceClient.getContainerClient('cvm-blob');
+const testResultsBlobContainerClient = blobServiceClient.getContainerClient('test-results')
 
 app.post('/upload', upload.single('file'), async (req, res) => {
   console.log('Upload start')
@@ -50,8 +54,8 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   const uploadBlobsStart = performance.now();
   // Step 4: Upload to Azure Blob
   await Promise.all([
-     uploadToBlob(encryptedPath, originalname),
-     uploadToBlob(`${encryptedPath}-wrapped-key`, `${originalname}-wrapped-key`)
+     uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
+     uploadToBlob(`${encryptedPath}-wrapped-key`, `${originalname}-wrapped-key`,cvmBlobContainerClient)
   ])
   const uploadBlobsEnd = performance.now();
   const uploadBlobsResult = uploadBlobsEnd - uploadBlobsStart
@@ -65,18 +69,19 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   const deleteTempFilesResult = deleteTempFilesEnd - deleteTempFilesStart
 
   
-  const results = [
-      ['Operation', 'Time'], // Table header
-      ['Encryption generation', `${generateResult}ms`],
-      ['Wrapping of encryption key', `${wrapResult}ms`],
-      ['Encrypt result', `${encryptResult}ms`],
-      ['Upload blobs', `${uploadBlobsResult}ms`],
-      ['Delete temp files', `${deleteTempFilesResult}ms`],
-      ['Total time', `${generateResult + wrapResult + encryptResult + uploadBlobsResult + deleteTempFilesResult}ms`]
-    ];
-    const tableOutput = table.table(results)
-    fs.writeFileSync(`./test-results/${req.file.originalname.split('.')[0]}-upload-perf.txt`,tableOutput);
-  
+  const results = {
+      'Operation': 'Time', 
+      'Encryption generation': generateResult,
+      'Wrapping of encryption key': wrapResult,
+      'Encrypt result': encryptResult,
+      'Upload blobs': uploadBlobsResult,
+      'Delete temp files': deleteTempFilesResult,
+      'Total time': generateResult + wrapResult + encryptResult + uploadBlobsResult + deleteTempFilesResult
+  }
+    const testResultsFilePath = `./test-results/${req.file.originalname.split('.')[0]}-upload-perf.txt`
+    fs.writeFileSync(`./test-results/${req.file.originalname.split('.')[0]}-upload-perf.txt`,JSON.stringify(results));
+  uploadToBlob(testResultsFilePath,`${req.file.originalname.split('.')[0]}-upload-perf.txt`,testResultsBlobContainerClient)
+
 
   res.send('File uploaded with HSM-backed key wrapping.');
 });
@@ -89,8 +94,8 @@ app.get('/download/:filename', async (req, res) => {
   const startDownload = performance.now();
   // Step 1: Download encrypted blob
   const [encryptedBuffer,wrappedKey] = await Promise.all([
-    downloadFromBlob(filename), 
-    downloadFromBlob(`${filename}-wrapped-key`)])
+    downloadFromBlob(filename,cvmBlobContainerClient), 
+    downloadFromBlob(`${filename}-wrapped-key`,cvmBlobContainerClient)])
   const endDownload = performance.now();
   const downloadResult = endDownload - startDownload
 
@@ -110,17 +115,17 @@ app.get('/download/:filename', async (req, res) => {
   const decryptResult = decryptEnd - decryptStart
 
 
-  const downloadResults = [
-    ['Operation', 'Time'],
-    ['Blob download', `${downloadResult}ms`],
-    ['Unwrap encryption key with Key Vault', `${unwrapKeyWithVaultResult}ms`],
-    ['File decryption', `${decryptResult}ms`],
-    ['Total time', `${downloadResult + unwrapKeyWithVaultResult + decryptResult}ms`]
-  ];
+  const downloadResults = {
+    'Operation': 'Time',
+    'Blob download': downloadResult,
+    'Unwrap encryption key with Key Vault': unwrapKeyWithVaultResult,
+    'File decryption': decryptResult,
+    'Total time': downloadResult + unwrapKeyWithVaultResult + decryptResult
+  }
+  const testResultsFilePath = `./test-results/${filename.split('.')[0]}-download-perf.txt`
+  fs.writeFileSync(testResultsFilePath,JSON.stringify(downloadResults));
+  uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-download-perf.txt`,testResultsBlobContainerClient)
 
-  const tableOutput = table.table(downloadResults);
-  fs.writeFileSync(`./test-results/${filename.split('.')[0]}-download-perf.txt`,tableOutput);
-  
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(decrypted);
 });
@@ -131,18 +136,19 @@ app.delete('/delete/:filename', async (req, res) => {
   const deleteStart = performance.now();
   await Promise.all([
     deleteKeyFromVault(filename.split('.').join('-')),
-    deleteBlob(filename),
-    deleteBlob(`${filename}-wrapped-key`),]
+    deleteBlob(filename, cvmBlobContainerClient),
+    deleteBlob(`${filename}-wrapped-key`, cvmBlobContainerClient),]
   );
   const deleteEnd = performance.now();
   
-  const deletionResult = [
-    ['Operation', 'Time'],
-    ['Deleted all resources', `${deleteEnd - deleteStart}ms`],
-  ];
-  const tableOutput = table.table(deletionResult);
-  fs.writeFileSync(`./test-results/${filename.split('.')[0]}-delete-perf.txt`,tableOutput);
-  
+  const deletionResult = {
+    'Operation': 'Time',
+    'Deleted all resources': deleteEnd - deleteStart,
+  }
+  const testResultsFilePath = `./test-results/${filename.split('.')[0]}-delete-perf.txt`
+  fs.writeFileSync(testResultsFilePath,JSON.stringify(deletionResult));
+  uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-delete-perf.txt`,testResultsBlobContainerClient)
+
   res.send('Key deleted from HSM. File will be unrecoverable after 7 days.');
 });
 

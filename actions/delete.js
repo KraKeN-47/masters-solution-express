@@ -8,8 +8,8 @@ async function deleteFile() {
   try {
     const uploadStart = performance.now();
     const response = await fetch(deleteUrl, {
-      method: 'DELETE', // Changed to POST, as requested, though DELETE is more typical.
-      //  We need to disable SSL verification because we are using localhost with a self-signed certificate
+      method: 'DELETE', // Changed to POST
+      //  We need to disable SSL verification because we are using a self-signed certificate
       agent: new (require('https')).Agent({ rejectUnauthorized: false }),
     });
     const uploadFinish = performance.now();
@@ -18,7 +18,7 @@ async function deleteFile() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.text(); // Or response.json(), depending on server response
+    const data = await response.text();
     console.log('Delete successful. Response:', data);
   } catch (error) {
     console.error('Error during deletion:', error);

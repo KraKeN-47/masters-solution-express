@@ -2,7 +2,10 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { exec } = require('node:child_process');
 
-const rootUrl = 'https://localhost'
+const rootUrl = 'https://20.238.26.218' // CVM-2
+// const rootUrl = 'https://4.231.232.86' // VM
+// const rootUrl = 'https://20.13.168.243' // CVM
+// const rootUrl = 'https://localhost' // LV
 const uploadUrl = `${rootUrl}/upload`
 const downloadUrl = (fileName) => `${rootUrl}/download/${fileName}`
 const deleteUrl = (fileName) => `${rootUrl}/delete/${fileName}`
@@ -51,7 +54,7 @@ async function processFiles() {
       if(isDownload) {
         await executeCommand(`node ${downloadFilePath} ${downloadUrl(file)} ${file}`, filePath);
       }
-      await wait(45);
+      await wait(7);
     }
 
     console.log('All files processed!');
