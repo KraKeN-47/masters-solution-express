@@ -5,6 +5,7 @@ async function uploadToBlob(filePath, filename, client, machineType) {
 }
 
 async function downloadFromBlob(filename, client, machineType) {
+  console.log('trying to download', `${machineType}-${filename}`)
   const blockBlobClient = client.getBlockBlobClient(`${machineType}-${filename}`);
   const downloadResponse = await blockBlobClient.download();
   return await streamToBuffer(downloadResponse.readableStreamBody);
