@@ -33,7 +33,6 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   const { machineType } = req.params;
   const { originalname, path } = req.file;
   const encryptedPath = path + `${machineType}.enc`;
-  console.log({encryptedPath})
 
   const generateStart = performance.now();
   // Step 1: Generate local AES key
@@ -55,6 +54,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
 
   const uploadBlobsStart = performance.now();
   // Step 4: Upload to Azure Blob
+  console.log({encryptedPath, originalname,cvmBlobContainerClient, wrappedKey: `${encryptedPath}-wrapped-key`, otherWrappedKey: `${originalname}-wrapped-key` })
   await Promise.all([
      uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
      uploadToBlob(`${encryptedPath}-wrapped-key`, `${originalname}-wrapped-key`,cvmBlobContainerClient)
