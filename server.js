@@ -54,7 +54,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
 
   const uploadBlobsStart = performance.now();
   // Step 4: Upload to Azure Blob
-  console.log({encryptedPath, originalname,cvmBlobContainerClient, wrappedKey: `${encryptedPath}-wrapped-key`, otherWrappedKey: `${originalname}-wrapped-key` })
+  console.log({encryptedPath, originalname, wrappedKey: `${encryptedPath}-wrapped-key`, otherWrappedKey: `${originalname}-wrapped-key` })
   await Promise.all([
      uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
      uploadToBlob(`${encryptedPath}-wrapped-key`, `${originalname}-wrapped-key`,cvmBlobContainerClient)
