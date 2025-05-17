@@ -1,5 +1,5 @@
 async function uploadToBlob(filePath, filename, client, machineType) {
-  const blockBlobClient = client.getBlockBlobClient(`${machineType}-${filename}`);
+  const blockBlobClient = client.getBlockBlobClient(`${machineType}-${filename}`, filename.includes('perf') ? {tags: [`${machineType}-perf`]} : undefined);
   console.log('starting blob upload', filePath, filename)
   await blockBlobClient.uploadFile(filePath);
 }
