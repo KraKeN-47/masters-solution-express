@@ -54,7 +54,6 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
 
   const uploadBlobsStart = performance.now();
   // Step 4: Upload to Azure Blob
-  console.log({encryptedPath, originalname, wrappedKey: `${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`, otherWrappedKey: `${originalname}-wrapped-key` })
   await Promise.all([
      uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
      uploadToBlob(`${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`, `${originalname.split('.')[0]}-wrapped-key.${originalname.split('.')[1]}`,cvmBlobContainerClient)
@@ -66,7 +65,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   // delete temp files
   fs.unlinkSync(path),
   fs.unlinkSync(encryptedPath)
-  fs.unlinkSync(`${encryptedPath}-wrapped-key`)
+  fs.unlinkSync(`${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`)
   const deleteTempFilesEnd = performance.now();
   const deleteTempFilesResult = deleteTempFilesEnd - deleteTempFilesStart
 
@@ -97,7 +96,7 @@ app.get('/download/:filename/:machineType', async (req, res) => {
   // Step 1: Download encrypted blob
   const [encryptedBuffer,wrappedKey] = await Promise.all([
     downloadFromBlob(filename,cvmBlobContainerClient), 
-    downloadFromBlob(`${filename}-wrapped-key`,cvmBlobContainerClient)])
+    downloadFromBlob(`${filename.split('.')[0]}-wrapped-key.${filename.split('.')[1]}`,cvmBlobContainerClient)])
   const endDownload = performance.now();
   const downloadResult = endDownload - startDownload
 
@@ -140,7 +139,7 @@ app.delete('/delete/:filename/:machineType', async (req, res) => {
   await Promise.all([
     deleteKeyFromVault(filename.split('.').join('-'),machineType),
     deleteBlob(filename, cvmBlobContainerClient),
-    deleteBlob(`${filename}-wrapped-key`, cvmBlobContainerClient),]
+    deleteBlob(`${filename.split('.')[0]}-wrapped-key.${filename.split('.')[1]}`, cvmBlobContainerClient),]
   );
   const deleteEnd = performance.now();
   
