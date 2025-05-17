@@ -17,7 +17,7 @@ function encryptFile(inputPath, outputPath, key,wrappedKey) {
     output.write(iv); // prepend IV
   
     input.pipe(cipher).pipe(output).on('finish', () => {
-      fs.writeFileSync(`${outputPath}-wrapped-key`,wrappedKey)
+      fs.writeFileSync(`${outputPath.split('.')[0]}-wrapped-key.${outputPath.split('.')[1]}`,wrappedKey)
       resolve();
     }).on('error', reject);
   });
