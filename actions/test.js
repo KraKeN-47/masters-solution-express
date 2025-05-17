@@ -59,7 +59,7 @@ async function processFiles() {
       console.log(`Processing file: ${filePath}`);
 
       if(isUpload) {
-        await executeCommand(`node ${uploadFilePath} ${filePath} ${uploadUrl}`,filePath);
+        await executeCommand(`node ${uploadFilePath} ${filePath} ${uploadUrl} ${myVmType}`,filePath);
       }
       if(isDelete) {
         await executeCommand(`node ${deleteFilePath} ${deleteUrl(file)}`,filePath);
