@@ -4,8 +4,8 @@ const { DefaultAzureCredential } = require('@azure/identity');
 const credential = new DefaultAzureCredential();
 const keyClient = new KeyClient(process.env.AZURE_KEYVAULT_URI, credential);
 
-async function wrapKeyWithVault(fileId, fileKey) {
-  const keyName = `file-${fileId}`.split('.').join('-');
+async function wrapKeyWithVault(fileId, fileKey, machineType) {
+  const keyName = `${machineType}-file-${fileId}`.split('.').join('-');
   console.log('creating key')
   // const key = await keyClient.createKey(keyName, 'RSA-HSM', {
   //   keyOps: ['wrapKey', 'unwrapKey']
@@ -21,8 +21,8 @@ async function wrapKeyWithVault(fileId, fileKey) {
   return result.result;
 }
 
-async function unwrapKeyWithVault(fileId,wrappedKeyBuffer) {
-  const keyName = `file-${fileId}`.split('.').join('-');
+async function unwrapKeyWithVault(fileId,wrappedKeyBuffer,machineType) {
+  const keyName = `${machineType}-file-${fileId}`.split('.').join('-');
   try {
     console.log(keyName)
     const key = await keyClient.getKey(keyName.split('.').join('-'));
@@ -37,8 +37,8 @@ async function unwrapKeyWithVault(fileId,wrappedKeyBuffer) {
   }
 }
 
-async function deleteKeyFromVault(fileId) {
-  const keyName = `file-${fileId}`;
+async function deleteKeyFromVault(fileId, machineType) {
+  const keyName = `${machineType}-file-${fileId}`;
   // await keyClient.beginDeleteKey(keyName);
   await keyClient.purgeDeletedKey(keyName);
 }

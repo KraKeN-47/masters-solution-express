@@ -42,7 +42,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
 
   const wrapStart = performance.now();
   // Step 2: Wrap the file key using Azure Key Vault (Premium with HSM)
-  const wrappedKey = await wrapKeyWithVault(originalname, fileKey);
+  const wrappedKey = await wrapKeyWithVault(originalname, fileKey, machineType);
   const wrapEnd = performance.now();
   const wrapResult = wrapEnd - wrapStart
 
@@ -54,10 +54,10 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
 
   const uploadBlobsStart = performance.now();
   // Step 4: Upload to Azure Blob
-  console.log({encryptedPath, originalname, wrappedKey: `${encryptedPath}-wrapped-key`, otherWrappedKey: `${originalname}-wrapped-key` })
+  console.log({encryptedPath, originalname, wrappedKey: `${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`, otherWrappedKey: `${originalname}-wrapped-key` })
   await Promise.all([
      uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
-     uploadToBlob(`${encryptedPath}-wrapped-key`, `${originalname}-wrapped-key`,cvmBlobContainerClient)
+     uploadToBlob(`${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`, `${originalname.split('.')[0]}-wrapped-key.${originalname.split('.')[1]}`,cvmBlobContainerClient)
   ])
   const uploadBlobsEnd = performance.now();
   const uploadBlobsResult = uploadBlobsEnd - uploadBlobsStart
@@ -88,8 +88,9 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
 });
 
 
-app.get('/download/:filename', async (req, res) => {
+app.get('/download/:filename/:machineType', async (req, res) => {
   console.log('Download start');
+  const { machineType } = req.params;
   const { filename } = req.params;
 
   const startDownload = performance.now();
@@ -102,7 +103,7 @@ app.get('/download/:filename', async (req, res) => {
 
   // Step 2: Unwrap file key from Vault (HSM prefered)
   const unwrapStart = performance.now();
-  const fileKey = await unwrapKeyWithVault(filename, wrappedKey);
+  const fileKey = await unwrapKeyWithVault(filename, wrappedKey, machineType);
   const unwrapEnd = performance.now();
   const unwrapKeyWithVaultResult = unwrapEnd - unwrapStart
 
@@ -132,12 +133,12 @@ app.get('/download/:filename', async (req, res) => {
   res.send(decrypted);
 });
 
-app.delete('/delete/:filename', async (req, res) => {
-  const { filename } = req.params;
+app.delete('/delete/:filename/:machineType', async (req, res) => {
+  const { filename, machineType } = req.params;
 
   const deleteStart = performance.now();
   await Promise.all([
-    deleteKeyFromVault(filename.split('.').join('-')),
+    deleteKeyFromVault(filename.split('.').join('-'),machineType),
     deleteBlob(filename, cvmBlobContainerClient),
     deleteBlob(`${filename}-wrapped-key`, cvmBlobContainerClient),]
   );
