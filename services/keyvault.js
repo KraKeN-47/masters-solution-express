@@ -39,7 +39,8 @@ async function unwrapKeyWithVault(fileId,wrappedKeyBuffer) {
 
 async function deleteKeyFromVault(fileId) {
   const keyName = `file-${fileId}`;
-  await keyClient.beginDeleteKey(keyName);
+  // await keyClient.beginDeleteKey(keyName);
+  await keyClient.purgeDeletedKey(keyName);
 }
 
 module.exports = { wrapKeyWithVault, unwrapKeyWithVault, deleteKeyFromVault };
