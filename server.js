@@ -53,6 +53,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   const encryptResult = encryptEnd - encryptStart
 
   const uploadBlobsStart = performance.now();
+  console.log('starting uploads')
   // Step 4: Upload to Azure Blob
   await Promise.all([
      uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
