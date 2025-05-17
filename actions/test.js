@@ -20,8 +20,8 @@ if(!myVmType) {
   return;
 }
 
-const downloadUrl = (fileName) => `${rootUrl}/download/${fileName.split('.')[0]}-${myVmType}.${fileName.split('.')[1]}`
-const deleteUrl = (fileName) => `${rootUrl}/delete/${fileName.split('.')[0]}-${myVmType}.${fileName.split('.')[1]}`
+const downloadUrl = (fileName) => `${rootUrl}/download/${fileName.split('.')[0]}-${myVmType}.${fileName.split('.')[1]}/${myVmType}`
+const deleteUrl = (fileName) => `${rootUrl}/delete/${fileName.split('.')[0]}-${myVmType}.${fileName.split('.')[1]}/${myVmType}`
 
 async function wait(seconds) {
   await new Promise(resolve => setTimeout(resolve, seconds * 1000));
