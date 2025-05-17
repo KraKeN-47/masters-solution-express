@@ -56,8 +56,8 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   console.log('starting uploads')
   // Step 4: Upload to Azure Blob
   await Promise.all([
-     uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
-     uploadToBlob(`${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`, `${originalname.split('.')[0]}-wrapped-key.${originalname.split('.')[1]}`,cvmBlobContainerClient)
+     uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient, machineType),
+     uploadToBlob(`${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`, `${originalname.split('.')[0]}-wrapped-key.${originalname.split('.')[1]}`,cvmBlobContainerClient, machineType)
   ])
   console.log('upload finished')
   const uploadBlobsEnd = performance.now();
@@ -82,7 +82,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   }
     const testResultsFilePath = `./test-results/${req.file.originalname.split('.')[0]}-upload-perf.json`
     fs.writeFileSync(`./test-results/${req.file.originalname.split('.')[0]}-upload-perf.json`,JSON.stringify(results));
-    uploadToBlob(testResultsFilePath,`${req.file.originalname.split('.')[0]}-upload-perf.json`,testResultsBlobContainerClient)
+    uploadToBlob(testResultsFilePath,`${req.file.originalname.split('.')[0]}-upload-perf.json`,testResultsBlobContainerClient, machineType)
 
 
   res.send('File uploaded with HSM-backed key wrapping.');
@@ -97,8 +97,8 @@ app.get('/download/:filename/:machineType', async (req, res) => {
   const startDownload = performance.now();
   // Step 1: Download encrypted blob
   const [encryptedBuffer,wrappedKey] = await Promise.all([
-    downloadFromBlob(filename,cvmBlobContainerClient), 
-    downloadFromBlob(`${filename.split('.')[0]}-wrapped-key.${filename.split('.')[1]}`,cvmBlobContainerClient)])
+    downloadFromBlob(filename,cvmBlobContainerClient, machineType), 
+    downloadFromBlob(`${filename.split('.')[0]}-wrapped-key.${filename.split('.')[1]}`,cvmBlobContainerClient, machineType)])
   const endDownload = performance.now();
   const downloadResult = endDownload - startDownload
 
@@ -128,7 +128,7 @@ app.get('/download/:filename/:machineType', async (req, res) => {
   }
   const testResultsFilePath = `./test-results/${filename.split('.')[0]}-download-perf.json`
   fs.writeFileSync(testResultsFilePath,JSON.stringify(downloadResults));
-  uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-download-perf.json`,testResultsBlobContainerClient)
+  uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-download-perf.json`,testResultsBlobContainerClient, machineType)
 
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(decrypted);
@@ -140,8 +140,8 @@ app.delete('/delete/:filename/:machineType', async (req, res) => {
   const deleteStart = performance.now();
   await Promise.all([
     deleteKeyFromVault(filename.split('.').join('-'),machineType),
-    deleteBlob(filename, cvmBlobContainerClient),
-    deleteBlob(`${filename.split('.')[0]}-wrapped-key.${filename.split('.')[1]}`, cvmBlobContainerClient),]
+    deleteBlob(filename, cvmBlobContainerClient, machineType),
+    deleteBlob(`${filename.split('.')[0]}-wrapped-key.${filename.split('.')[1]}`, cvmBlobContainerClient, machineType),]
   );
   const deleteEnd = performance.now();
   
@@ -151,7 +151,7 @@ app.delete('/delete/:filename/:machineType', async (req, res) => {
   }
   const testResultsFilePath = `./test-results/${filename.split('.')[0]}-delete-perf.json`
   fs.writeFileSync(testResultsFilePath,JSON.stringify(deletionResult));
-  uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-delete-perf.json`,testResultsBlobContainerClient)
+  uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-delete-perf.json`,testResultsBlobContainerClient, machineType)
 
   res.send('Key deleted from HSM. File will be unrecoverable after 7 days.');
 });

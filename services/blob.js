@@ -1,17 +1,17 @@
-async function uploadToBlob(filePath, filename, client) {
-  const blockBlobClient = client.getBlockBlobClient(filename);
+async function uploadToBlob(filePath, filename, client, machineType) {
+  const blockBlobClient = client.getBlockBlobClient(`${machineType}-${filename}`);
   console.log('starting blob upload', filePath, filename)
   await blockBlobClient.uploadFile(filePath);
 }
 
-async function downloadFromBlob(filename, client) {
-  const blockBlobClient = client.getBlockBlobClient(filename);
+async function downloadFromBlob(filename, client, machineType) {
+  const blockBlobClient = client.getBlockBlobClient(`${machineType}-${filename}`);
   const downloadResponse = await blockBlobClient.download();
   return await streamToBuffer(downloadResponse.readableStreamBody);
 }
 
-async function deleteBlob(filename, client) {
-  const blockBlobClient = client.getBlockBlobClient(filename);
+async function deleteBlob(filename, client, machineType) {
+  const blockBlobClient = client.getBlockBlobClient(`${machineType}-${filename}`);
   console.log('deleting', filename)
   await blockBlobClient.deleteIfExists();
   console.log('deleted if exists')
