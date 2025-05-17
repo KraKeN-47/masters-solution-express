@@ -32,7 +32,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   console.log('Upload start')
   const { machineType } = req.params;
   const { originalname, path } = req.file;
-  const encryptedPath = path + `${machineType}.enc`;
+  const encryptedPath = path + `-${machineType}.enc`;
 
   const generateStart = performance.now();
   // Step 1: Generate local AES key
