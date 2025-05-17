@@ -54,7 +54,7 @@ async function processFiles() {
       if(isDownload) {
         await executeCommand(`node ${downloadFilePath} ${downloadUrl(file)} ${file}`, filePath);
       }
-      await wait(7);
+      await wait(0.5);
     }
 
     console.log('All files processed!');
