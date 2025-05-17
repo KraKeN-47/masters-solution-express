@@ -28,10 +28,11 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZU
 const cvmBlobContainerClient = blobServiceClient.getContainerClient('cvm-blob');
 const testResultsBlobContainerClient = blobServiceClient.getContainerClient('test-results')
 
-app.post('/upload', upload.single('file'), async (req, res) => {
+app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   console.log('Upload start')
+  const { machineType } = req.params;
   const { originalname, path } = req.file;
-  const encryptedPath = path + '.enc';
+  const encryptedPath = path + `${machineType}.enc`;
 
   const generateStart = performance.now();
   // Step 1: Generate local AES key

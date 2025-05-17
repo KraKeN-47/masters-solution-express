@@ -7,8 +7,21 @@ const rootUrl = 'https://20.238.26.218' // CVM-2
 // const rootUrl = 'https://20.13.168.243' // CVM
 // const rootUrl = 'https://localhost' // LV
 const uploadUrl = `${rootUrl}/upload`
-const downloadUrl = (fileName) => `${rootUrl}/download/${fileName}`
-const deleteUrl = (fileName) => `${rootUrl}/delete/${fileName}`
+
+const myVmType = process.argv[3]
+
+if(!process.argv[2]) {
+  console.error("Missing 1st argument: upload, delete, download")
+  return;
+}
+
+if(!myVmType) {
+  console.error("Missing 2nd argument vm type");
+  return;
+}
+
+const downloadUrl = (fileName) => `${rootUrl}/download/${fileName.split('.')[0]}-${myVmType}.${fileName.split('.')[1]}`
+const deleteUrl = (fileName) => `${rootUrl}/delete/${fileName.split('.')[0]}-${myVmType}.${fileName.split('.')[1]}`
 
 async function wait(seconds) {
   await new Promise(resolve => setTimeout(resolve, seconds * 1000));

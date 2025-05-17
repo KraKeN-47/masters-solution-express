@@ -4,8 +4,9 @@ const FormData = require('form-data')
 
 const filePath = process.argv[2];
 const uploadUrl = process.argv[3];
-
-console.log({filePath, uploadUrl})
+const machineType = process.argv[4];
+const fetchUrl = `${uploadUrl}/${machineType}`
+console.log({filePath, uploadUrl, machineType, fetchUrl})
 
 async function uploadFile() {
   try {
@@ -19,7 +20,8 @@ async function uploadFile() {
     formData.append('file', fileStream);
 
     const uploadStart = performance.now();
-    const response = await fetch(uploadUrl, {
+    console.log('fetching', fetchUrl)
+    const response = await fetch(fetchUrl, {
       method: 'POST',
       body: formData,
       //  We need to disable SSL verification because we are using a self-signed certificate
