@@ -59,6 +59,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
      uploadToBlob(encryptedPath, originalname,cvmBlobContainerClient),
      uploadToBlob(`${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`, `${originalname.split('.')[0]}-wrapped-key.${originalname.split('.')[1]}`,cvmBlobContainerClient)
   ])
+  console.log('upload finished')
   const uploadBlobsEnd = performance.now();
   const uploadBlobsResult = uploadBlobsEnd - uploadBlobsStart
   

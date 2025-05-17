@@ -1,5 +1,6 @@
 async function uploadToBlob(filePath, filename, client) {
   const blockBlobClient = client.getBlockBlobClient(filename);
+  console.log('starting blob upload', filePath, filename)
   await blockBlobClient.uploadFile(filePath);
 }
 
