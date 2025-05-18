@@ -23,3 +23,11 @@ sudo apt install nodejs
 cd ~/masters-solution-express
 npm i
 mkdir test-results
+git clone https://github.com/Azure/azure-managed-hsm-key-attestation
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python3 get-pip.py
+sudo apt install python3.10-venv
+python3 -m venv attestation
+source attestation/bin/activate
+pip3 install -r requirements.txt
+cd src/
