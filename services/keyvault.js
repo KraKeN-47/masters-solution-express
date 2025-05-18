@@ -7,12 +7,12 @@ const keyClient = new KeyClient(process.env.AZURE_KEYVAULT_URI, credential);
 async function wrapKeyWithVault(fileId, fileKey, machineType) {
   const keyName = `${machineType}-file-${fileId}`.split('.').join('-');
   console.log('creating key')
-  const key = await keyClient.createKey(keyName, 'RSA-HSM', {
-    keyOps: ['wrapKey', 'unwrapKey']
-  });
-  // const key = await keyClient.createKey(keyName, 'RSA', {
-  //   keyOps: ['wrapKey', 'unwrapKey'],
+  // const key = await keyClient.createKey(keyName, 'RSA-HSM', {
+  //   keyOps: ['wrapKey', 'unwrapKey']
   // });
+  const key = await keyClient.createKey(keyName, 'RSA', {
+    keyOps: ['wrapKey', 'unwrapKey'],
+  });
   console.log('key created')
   const cryptoClient = new CryptographyClient(key.id, credential);
   const result = await cryptoClient.wrapKey('RSA-OAEP', fileKey);
