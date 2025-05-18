@@ -63,26 +63,22 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   const uploadBlobsEnd = performance.now();
   const uploadBlobsResult = uploadBlobsEnd - uploadBlobsStart
   
-  const deleteTempFilesStart = performance.now();
   // delete temp files
   fs.unlinkSync(path),
   fs.unlinkSync(encryptedPath)
   fs.unlinkSync(`${encryptedPath.split('.')[0]}-wrapped-key.${encryptedPath.split('.')[1]}`)
-  const deleteTempFilesEnd = performance.now();
-  const deleteTempFilesResult = deleteTempFilesEnd - deleteTempFilesStart
-
   
   const results = {
-      'Operation': 'Time', 
-      'Wrapping of encryption key': wrapResult,
-      'Encrypt result': encryptResult,
-      'Upload blobs': uploadBlobsResult,
-      'Total operation times': wrapResult + encryptResult + uploadBlobsResult,
-      'Total api exec time': generateResult + wrapResult + encryptResult + uploadBlobsResult + deleteTempFilesResult
+      'Operacija': 'Laikas', 
+      'Šifravimo rakto užsandarinimas': wrapResult,
+      'Rezultato užšifravimas': encryptResult,
+      'Failų įkėlimas': uploadBlobsResult,
+      'Bendras operacijų laikas': wrapResult + encryptResult + uploadBlobsResult,
   }
     const testResultsFilePath = `./test-results/${req.file.originalname.split('.')[0]}-upload-perf.json`
     fs.writeFileSync(`./test-results/${req.file.originalname.split('.')[0]}-upload-perf.json`,JSON.stringify(results));
     uploadToBlob(testResultsFilePath,`${req.file.originalname.split('.')[0]}-upload-perf.json`,testResultsBlobContainerClient, machineType)
+    fs.unlinkSync(testResultsFilePath)
 
 
   res.send('File uploaded with HSM-backed key wrapping.');
@@ -119,16 +115,16 @@ app.get('/download/:filename/:machineType', async (req, res) => {
 
 
   const downloadResults = {
-    'Operation': 'Time',
-    'Blob download': downloadResult,
-    'Unwrap encryption key with Key Vault': unwrapKeyWithVaultResult,
-    'File decryption': decryptResult,
-    'Total operation times': downloadResult + unwrapKeyWithVaultResult + decryptResult,
-    'Total time': downloadResult + unwrapKeyWithVaultResult + decryptResult
+    'Operacija': 'Laikas',
+    'Failų atsisiuntimas': downloadResult,
+    'Šifravimo rakto atsandarinimas': unwrapKeyWithVaultResult,
+    'Failo atšifravimas': decryptResult,
+    'Bendras operacijų laikas': downloadResult + unwrapKeyWithVaultResult + decryptResult,
   }
   const testResultsFilePath = `./test-results/${filename.split('.')[0]}-download-perf.json`
   fs.writeFileSync(testResultsFilePath,JSON.stringify(downloadResults));
   uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-download-perf.json`,testResultsBlobContainerClient, machineType)
+  fs.unlinkSync(testResultsFilePath)
 
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(decrypted);
@@ -146,12 +142,13 @@ app.delete('/delete/:filename/:machineType', async (req, res) => {
   const deleteEnd = performance.now();
   
   const deletionResult = {
-    'Operation': 'Time',
-    'Total operation times': deleteEnd - deleteStart,
+    'Operacija': 'Laikas',
+    'Failo ištrinimas': deleteEnd - deleteStart,
   }
   const testResultsFilePath = `./test-results/${filename.split('.')[0]}-delete-perf.json`
   fs.writeFileSync(testResultsFilePath,JSON.stringify(deletionResult));
   uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-delete-perf.json`,testResultsBlobContainerClient, machineType)
+  fs.unlinkSync(testResultsFilePath)
 
   res.send('Key deleted from HSM. File will be unrecoverable after 7 days.');
 });
