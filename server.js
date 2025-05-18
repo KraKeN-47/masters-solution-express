@@ -78,7 +78,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
     const testResultsFilePath = `./test-results/${req.file.originalname.split('.')[0]}-upload-perf.json`
     fs.writeFileSync(`./test-results/${req.file.originalname.split('.')[0]}-upload-perf.json`,JSON.stringify(results));
     uploadToBlob(testResultsFilePath,`${req.file.originalname.split('.')[0]}-upload-perf.json`,testResultsBlobContainerClient, machineType)
-    fs.unlinkSync(testResultsFilePath)
+    
 
 
   res.send('File uploaded with HSM-backed key wrapping.');
@@ -124,7 +124,7 @@ app.get('/download/:filename/:machineType', async (req, res) => {
   const testResultsFilePath = `./test-results/${filename.split('.')[0]}-download-perf.json`
   fs.writeFileSync(testResultsFilePath,JSON.stringify(downloadResults));
   uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-download-perf.json`,testResultsBlobContainerClient, machineType)
-  fs.unlinkSync(testResultsFilePath)
+  
 
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(decrypted);
@@ -148,7 +148,7 @@ app.delete('/delete/:filename/:machineType', async (req, res) => {
   const testResultsFilePath = `./test-results/${filename.split('.')[0]}-delete-perf.json`
   fs.writeFileSync(testResultsFilePath,JSON.stringify(deletionResult));
   uploadToBlob(testResultsFilePath,`${filename.split('.')[0]}-delete-perf.json`,testResultsBlobContainerClient, machineType)
-  fs.unlinkSync(testResultsFilePath)
+  
 
   res.send('Key deleted from HSM. File will be unrecoverable after 7 days.');
 });
