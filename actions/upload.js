@@ -1,6 +1,7 @@
 const fetch = require('node-fetch')
 const fs = require('fs')
 const FormData = require('form-data')
+const path = require('path');
 
 const filePath = process.argv[2];
 const uploadUrl = process.argv[3];
@@ -28,7 +29,14 @@ async function uploadFile() {
       agent: new (require('https')).Agent({ rejectUnauthorized: false }),
     });
     const uploadEnd = performance.now();
-    console.log(`Upload endpoint took ${uploadEnd - uploadStart}ms`)
+    try {
+      const filename = `${machineType}-${filePath.split(`demoFiles\\`)[1].split('.')[0]}-upload-perf.json`
+      console.log('writing to', path.join(__dirname,`../display-tests/results-${machineType === 'VM' ? 'results-vm' : machineType === 'CVM' ? 'results-cvm' : 'results-local'}/api-response/${filename}`))
+      fs.writeFileSync(path.join(__dirname,`../display-tests/${machineType === 'VM' ? 'results-vm' : machineType === 'CVM' ? 'results-cvm' : 'results-local'}/api-response/${filename}`),JSON.stringify({'Operacija': 'Laikas', 'Failo įkėlimo trukmė': uploadEnd-uploadStart}))
+      console.log(`Upload endpoint took ${uploadEnd - uploadStart}ms`)
+    } catch (error) {
+      console.log(error)
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

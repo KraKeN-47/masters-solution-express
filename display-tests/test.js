@@ -9,28 +9,33 @@ function openInBrowser(filePath) {
 
 // upload, delete, download
 const folder = process.argv[2];
+const apiResponse = process.argv[3] === 'true'
 
-const folders = {
+const folders = apiResponse ? {
+  CVM: "./results-cvm/api-response",
+  VM: "./results-vm/api-response",
+  LM: "./results-local/api-response"
+} : {
   CVM: "./results-cvm",
   VM: "./results-vm",
-  Local: "./results-local"
-};
+  LM: "./results-local"
+}
 
 const colors = {
   CVM: "red",
   VM: "blue",
-  Local: "green"
+  LM: "green"
 };
 
 async function generateChart() {
   const performanceData = {};
+  // const apiResponsePerfData = {};
   const operationsSet = new Set();
   const sortedSizes = [];
   // Load data from all folders
   for (const [label, folderPath] of Object.entries(folders)) {
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith(".json")).filter(v => v.includes(`${folder}-perf`));
     performanceData[label] = {};
-
     for (const file of files) {
       const fullPath = path.join(folderPath, file);
       const content = fs.readFileSync(fullPath, "utf-8");
@@ -43,7 +48,7 @@ async function generateChart() {
       performanceData[label][sizeKey] = json;
 
       Object.keys(json).forEach(op => {
-        if (op !== "Operation") operationsSet.add(op);
+        if (op !== "Operacija") operationsSet.add(op);
       });
 
       if (!sortedSizes.includes(sizeKey)) {
@@ -54,16 +59,13 @@ async function generateChart() {
 
   sortedSizes.sort((a, b) => parseInt(a) - parseInt(b));
 
-  console.log(performanceData)
-
   // Generate one chart per operation
   for (const operation of operationsSet) {
-    const datasets = Object.entries(performanceData).map(([label, fileMap]) => {
+    let datasets = Object.entries(performanceData).map(([label, fileMap]) => {
       const data = sortedSizes.map(size => {
         const json = fileMap[size];
         return json && operation in json ? json[operation] : null;
       });
-
       return {
         label,
         data,
@@ -75,12 +77,14 @@ async function generateChart() {
       };
     });
 
+   datasets = datasets.filter(v => v.data.filter(Boolean).length > 0)
 
     const html = `
-<!DOCTYPE html>
+<!DOCTYPE html >
 <html>
 <head>
-  <title>${operation}</title>
+ <meta charset="utf-8">
+ <title>${operation === "Rezultato užšifravimas" ? "Failo užšifravimas" : operation}</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { background: white; color: black; font-family: sans-serif; padding: 2rem; }
@@ -88,7 +92,7 @@ async function generateChart() {
   </style>
 </head>
 <body>
-  <h2>${operation}</h2>
+  <h2>${operation === "Rezultato užšifravimas" ? "Failo užšifravimas" : operation}</h2>
   <canvas id="chart"></canvas>
   <script>
     const ctx = document.getElementById('chart').getContext('2d');
@@ -103,7 +107,7 @@ async function generateChart() {
         plugins: {
           title: {
             display: true,
-            text: ${JSON.stringify(operation)}
+            text: ${JSON.stringify(operation === "Rezultato užšifravimas" ? "Failo užšifravimas" : operation)}
           },
           legend: {
             position: 'bottom'

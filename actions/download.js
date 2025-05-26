@@ -1,6 +1,7 @@
 const fetch = require('node-fetch')
 const fs = require('fs')
 const { pipeline } = require('stream/promises')
+const path = require('path')
 
 const downloadUrl = process.argv[2]
 const downloadPath = `./downloads/downloaded_${process.argv[3]}`; // Explicit output path
@@ -16,7 +17,15 @@ async function downloadFile() {
       agent: new (require('https')).Agent({ rejectUnauthorized: false }),
     });
     const downloadEndpointEnd = performance.now();
-    console.log(`Download endpoint took ${downloadEndpointEnd - downloadEndpointStart}ms`)
+    try {
+      const filename = `${downloadUrl.split('/download/')[1].split('/')[1]}-${downloadUrl.split('/download/')[1].split('/')[0].split('.')[0]}-download-perf.json`
+      const machineType = `${downloadUrl.split('/download/')[1].split('/')[1]}`;
+      console.log('writing to', path.join(__dirname,`../display-tests/results-${machineType === 'VM' ? 'results-vm' : machineType === 'CVM' ? 'results-cvm' : 'results-local'}/api-response/${filename}`))
+      fs.writeFileSync(path.join(__dirname,`../display-tests/${machineType === 'VM' ? 'results-vm' : machineType === 'CVM' ? 'results-cvm' : 'results-local'}/api-response/${filename}`),JSON.stringify({'Operacija': 'Laikas', 'Failo atsisiuntimo trukmė': downloadEndpointEnd-downloadEndpointStart}))
+      console.log(`Download endpoint took ${downloadEndpointEnd - downloadEndpointStart}ms`)
+    } catch (error) {
+      console.log(error)
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

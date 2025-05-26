@@ -1,0 +1,1 @@
+az rest --method get --uri https://masters-managed-hsm.managedhsm.azure.net/keys/CVM-file-1000-txt/72c320703e3e031db75773d9158ee80f/attestation?api-version=7.6-preview.1 --resource https://managedhsm.azure.net > attestation.json

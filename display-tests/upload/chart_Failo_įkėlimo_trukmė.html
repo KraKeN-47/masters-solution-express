@@ -1,0 +1,54 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Failo įkėlimo trukmė</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: white; color: black; font-family: sans-serif; padding: 2rem; }
+    canvas { max-width: 1500px; height: 300px; max-height: 600px; transform: 'scale(1.5)'; }
+  </style>
+</head>
+<body>
+  <h2>Failo įkėlimo trukmė</h2>
+  <canvas id="chart"></canvas>
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["1","5","10","25","50","75","100"],
+        datasets: [{"label":"CVM","data":[602.698,892.7512,1104.2426,1514.5228000000002,2290.4901,3255.9193,3909.2556000000004],"borderColor":"red","backgroundColor":"red","fill":false,"tension":0.1,"pointBackgroundColor":"black"},{"label":"VM","data":[587.9236,938.1365000000001,944.4869000000001,1530.6541,2021.8706999999997,2943.5763,3606.4357],"borderColor":"blue","backgroundColor":"blue","fill":false,"tension":0.1,"pointBackgroundColor":"black"},{"label":"LM","data":[1630.5705,2397.3923,3107.8118,2261.357,4074.9918,10475.022500000001,23192.5471],"borderColor":"green","backgroundColor":"green","fill":false,"tension":0.1,"pointBackgroundColor":"black"}]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Failo įkėlimo trukmė"
+          },
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Laikas, ms'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Failo dydis, mb'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

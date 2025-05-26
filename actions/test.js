@@ -2,10 +2,11 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { exec } = require('node:child_process');
 
-const rootUrl = 'https://20.238.26.218' // CVM-2
+// const rootUrl = 'https://20.238.26.218' // CVM-2
+const rootUrl = 'https://4.231.233.82' // VM-2
 // const rootUrl = 'https://4.231.232.86' // VM
 // const rootUrl = 'https://20.13.168.243' // CVM
-// const rootUrl = 'https://localhost' // LV
+// const rootUrl = 'https://localhost' // LM
 const uploadUrl = `${rootUrl}/upload`
 
 const myVmType = process.argv[3]
@@ -50,6 +51,14 @@ const isDownload = process.argv[2] === 'download';
 async function processFiles() {
   try {
     const files = await fs.readdir('./demoFiles');
+    files.sort((a, b) => {
+      const getSize = (filename) => {
+        const match = filename.match(/(\d+)mb/i);
+        return match ? parseInt(match[1]) : 0;
+      };
+      return getSize(a) - getSize(b);
+    });
+
     const uploadFilePath = path.join(`${__dirname}/upload.js`)
     const deleteFilePath = path.join(`${__dirname}/delete.js`)
     const downloadFilePath = path.join(`${__dirname}/download.js`)
@@ -67,7 +76,7 @@ async function processFiles() {
       if(isDownload) {
         await executeCommand(`node ${downloadFilePath} ${downloadUrl(file)} ${file}`, filePath);
       }
-      await wait(0.5);
+      await wait(20);
     }
 
     console.log('All files processed!');

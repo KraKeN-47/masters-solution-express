@@ -71,7 +71,7 @@ app.post('/upload/:machineType', upload.single('file'), async (req, res) => {
   const results = {
       'Operacija': 'Laikas', 
       'Šifravimo rakto užsandarinimas': wrapResult,
-      'Rezultato užšifravimas': encryptResult,
+      'Failo užšifravimas': encryptResult,
       'Failų įkėlimas': uploadBlobsResult,
       'Bendras operacijų laikas': wrapResult + encryptResult + uploadBlobsResult,
   }

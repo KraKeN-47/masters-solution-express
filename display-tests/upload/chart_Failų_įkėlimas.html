@@ -1,0 +1,54 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Failų įkėlimas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: white; color: black; font-family: sans-serif; padding: 2rem; }
+    canvas { max-width: 1500px; height: 300px; max-height: 600px; transform: 'scale(1.5)'; }
+  </style>
+</head>
+<body>
+  <h2>Failų įkėlimas</h2>
+  <canvas id="chart"></canvas>
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["1","5","10","25","50","75","100"],
+        datasets: [{"label":"CVM","data":[33.224961000029,93.62993500009179,243.2257109999191,350.75435599987395,632.4734680000693,1186.5663209999911,1390.5060229999945],"borderColor":"red","backgroundColor":"red","fill":false,"tension":0.1,"pointBackgroundColor":"black"},{"label":"VM","data":[54.85509099999763,175.9912089999998,136.63072099999408,524.1604769999976,676.1932850000012,1191.4775369999988,1399.8858720000135],"borderColor":"blue","backgroundColor":"blue","fill":false,"tension":0.1,"pointBackgroundColor":"black"}]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Failų įkėlimas"
+          },
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Laikas, ms'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Failo dydis, mb'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

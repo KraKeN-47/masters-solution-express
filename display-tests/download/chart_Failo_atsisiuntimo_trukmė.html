@@ -1,0 +1,54 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Failo atsisiuntimo trukmė</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: white; color: black; font-family: sans-serif; padding: 2rem; }
+    canvas { max-width: 1500px; height: 300px; max-height: 600px; transform: 'scale(1.5)'; }
+  </style>
+</head>
+<body>
+  <h2>Failo atsisiuntimo trukmė</h2>
+  <canvas id="chart"></canvas>
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["1","5","10","25","50","75","100"],
+        datasets: [{"label":"CVM","data":[342.218,429.9805,446.5743,677.2194,1133.6627999999998,1380.0912,1849.529],"borderColor":"red","backgroundColor":"red","fill":false,"tension":0.1,"pointBackgroundColor":"black"},{"label":"VM","data":[287.50919999999996,360.1767,444.7631,1139.8143,1061.8763,1538.7503,1722.6492],"borderColor":"blue","backgroundColor":"blue","fill":false,"tension":0.1,"pointBackgroundColor":"black"},{"label":"LM","data":[1532.0677999999998,1906.7028,2254.4468,3942.0221,6235.199799999999,9273.7754,11741.3727],"borderColor":"green","backgroundColor":"green","fill":false,"tension":0.1,"pointBackgroundColor":"black"}]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Failo atsisiuntimo trukmė"
+          },
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Laikas, ms'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Failo dydis, mb'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

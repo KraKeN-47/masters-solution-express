@@ -1,0 +1,54 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Šifravimo rakto atsandarinimas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: white; color: black; font-family: sans-serif; padding: 2rem; }
+    canvas { max-width: 1500px; height: 300px; max-height: 600px; transform: 'scale(1.5)'; }
+  </style>
+</head>
+<body>
+  <h2>Šifravimo rakto atsandarinimas</h2>
+  <canvas id="chart"></canvas>
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["1","5","10","25","50","75","100"],
+        datasets: [{"label":"CVM","data":[17.851838999893516,19.38115100003779,21.152065000031143,22.751777000026777,29.40732799982652,25.177596000023186,25.43119699996896],"borderColor":"red","backgroundColor":"red","fill":false,"tension":0.1,"pointBackgroundColor":"black"},{"label":"VM","data":[16.013241000007838,20.055647999979556,18.611366000026464,28.010004999989178,34.740033000009134,23.58766399999149,21.55712799995672],"borderColor":"blue","backgroundColor":"blue","fill":false,"tension":0.1,"pointBackgroundColor":"black"}]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Šifravimo rakto atsandarinimas"
+          },
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Laikas, ms'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Failo dydis, mb'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

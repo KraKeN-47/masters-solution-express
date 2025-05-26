@@ -1,0 +1,54 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Bendras operacijų laikas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: white; color: black; font-family: sans-serif; padding: 2rem; }
+    canvas { max-width: 1500px; height: 300px; max-height: 600px; transform: 'scale(1.5)'; }
+  </style>
+</head>
+<body>
+  <h2>Bendras operacijų laikas</h2>
+  <canvas id="chart"></canvas>
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["1","5","10","25","50","75","100"],
+        datasets: [{"label":"CVM","data":[119.17112599965185,179.52089700009674,157.8634280001279,274.5389350000769,548.0180609999225,611.9682589999866,889.7199180000462],"borderColor":"red","backgroundColor":"red","fill":false,"tension":0.1,"pointBackgroundColor":"black"},{"label":"VM","data":[65.36266499996418,109.06551499996567,151.40178900002502,727.4736060000141,492.46971099992516,792.3872750000446,803.4074649999384],"borderColor":"blue","backgroundColor":"blue","fill":false,"tension":0.1,"pointBackgroundColor":"black"}]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Bendras operacijų laikas"
+          },
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Laikas, ms'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Failo dydis, mb'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

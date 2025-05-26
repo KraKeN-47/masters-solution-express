@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Your Azure Storage connection string and container name
+// azure secret
 const AZURE_STORAGE_CONNECTION_STRING = ``;
 if(AZURE_STORAGE_CONNECTION_STRING.length === 0) {
   console.error('missing azure storage connection string')
@@ -11,14 +12,14 @@ if(AZURE_STORAGE_CONNECTION_STRING.length === 0) {
 const CONTAINER_NAME = 'test-results';
 
 let DIR;
-const machineType = process.argv[3];
+const machineType = process.argv[2];
 
 if(machineType === 'VM') { DIR = 'results-vm'}
 if(machineType === 'LM') { DIR = 'results-local'}
 if(machineType === 'CVM') { DIR = 'results-cvm'}
 
 function blobFilterCondition(blobName) {
-  return blobName.includes(machineType);
+  return blobName.split('-').find(v => v === machineType);
 }
 
 async function downloadBlobsByCondition() {
@@ -30,7 +31,6 @@ async function downloadBlobsByCondition() {
 
   // List and iterate blobs
   for await (const blob of containerClient.listBlobsFlat()) {
-    console.log(blob)
     const blobName = blob.name;
 
     if (blobFilterCondition(blobName)) {
